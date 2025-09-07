@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Rental Application</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .section {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .car-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .car-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .car-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+
+        .car-card h3 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .car-card p {
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .price {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin: 1rem 0;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .user-info {
+            color: #667eea;
+            font-weight: 500;
+        }
+
+        #bookingList {
+            margin-top: 2rem;
+        }
+
+        .booking-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #667eea;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">🚗 Car Rental Pro</div>
+        <div class="nav-buttons">
+            <span id="userInfo" class="user-info hidden"></span>
+            <button class="btn btn-secondary" onclick="showSection('home')" id="homeBtn">Home</button>
+            <button class="btn btn-secondary" onclick="showSection('cars')" id="carsBtn">Browse Cars</button>
+            <button class="btn btn-secondary" onclick="showSection('bookings')" id="bookingsBtn" style="display:none;">My Bookings</button>
+            <button class="btn btn-secondary" onclick="showSection('addCar')" id="addCarBtn" style="display:none;">Add Car</button>
+            <button class="btn btn-primary" onclick="showSection('login')" id="loginBtn">Login</button>
+            <button class="btn btn-secondary" onclick="showSection('register')" id="registerBtn">Register</button>
+            <button class="btn btn-secondary" onclick="logout()" id="logoutBtn" style="display:none;">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Home Section -->
+        <div id="home" class="section active">
+            <div class="hero">
+                <h1>Welcome to Car Rental Pro</h1>
+                <p>Find and rent the perfect car for your journey. Choose from our wide selection of vehicles.</p>
+                <button class="btn btn-primary" onclick="showSection('cars')">Browse Cars</button>
+                <button class="btn btn-secondary" onclick="showSection('register')">Get Started</button>
+            </div>
+        </div>
+
+        <!-- Login Section -->
+        <div id="login" class="section">
+            <h2>Login to Your Account</h2>
+            <div id="loginAlert"></div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginUsername">Username:</label>
+                    <input type="text" id="loginUsername" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password:</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+        </div>
+
+        <!-- Register Section -->
+        <div id="register" class="section">
+            <h2>Create New Account</h2>
+            <div id="registerAlert"></div>
+            <form id="registerForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="registerUsername">Username:</label>
+                        <input type="text" id="registerUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerEmail">Email:</label>
+                        <input type="email" id="registerEmail" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Password:</label>
+                    <input type="password" id="registerPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Register</button>
+            </form>
+        </div>
+
+        <!-- Cars Section -->
+        <div id="cars" class="section">
+            <h2>Available Cars</h2>
+            <div id="carGrid" class="car-grid">
+                <!-- Cars will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Add Car Section -->
+        <div id="addCar" class="section">
+            <h2>Add New Car</h2>
+            <div id="addCarAlert"></div>
+            <form id="addCarForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="carName">Car Brand:</label>
+                        <input type="text" id="carName" required placeholder="e.g., Toyota">
+                    </div>
+                    <div class="form-group">
+                        <label for="carModel">Model:</label>
+                        <input type="text" id="carModel" required placeholder="e.g., Camry">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="carYear">Year:</label>
+                        <input type="number" id="carYear" required min="2000" max="2025">
+                    </div>
+                    <div class="form-group">
+                        <label for="carPrice">Price per Day ($):</label>
+                        <input type="number" id="carPrice" required min="0" step="0.01">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Add Car</button>
+            </form>
+        </div>
+
+        <!-- Bookings Section -->
+        <div id="bookings" class="section">
+            <h2>My Bookings</h2>
+            <div id="bookingAlert"></div>
+            <div id="bookingList">
+                <!-- Bookings will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Book Car Section -->
+        <div id="bookCar" class="section">
+            <h2>Book Car</h2>
+            <div id="bookCarAlert"></div>
+            <form id="bookCarForm">
+                <div id="selectedCarInfo"></div>
+                <div class="form-group">
+                    <label for="customerName">Your Name:</label>
+                    <input type="text" id="customerName" required>
+                </div>
+                <div class="form-group">
+                    <label for="bookingDate">Booking Date:</label>
+                    <input type="date" id="bookingDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="rentalDays">Number of Days:</label>
+                    <input type="number" id="rentalDays" required min="1" value="1">
+                </div>
+                <div id="totalCost" class="price"></div>
+                <button type="submit" class="btn btn-primary">Book Now</button>
+                <button type="button" class="btn btn-secondary" onclick="showSection('cars')">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let selectedCar = null;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCars();
+
+            // Check if user is logged in (basic session management)
+            const userData = localStorage.getItem('currentUser');
+            if (userData) {
+                currentUser = JSON.parse(userData);
+                updateUIForLoggedInUser();
+            }
+        });
+
+        // Navigation functions
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+
+            // Load data for specific sections
+            if (sectionId === 'cars') {
+                loadCars();
+            } else if (sectionId === 'bookings') {
+                loadBookings();
+            }
+        }
+
+        // Authentication functions
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const response = await fetch('/api/users/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    currentUser = data.user;
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    updateUIForLoggedInUser();
+                    showAlert('loginAlert', 'Login successful!', 'success');
+                    setTimeout(() => showSection('home'), 1000);
+                } else {
+                    showAlert('loginAlert', data.message, 'error');
+                }
+            } catch (error) {
+                showAlert('loginAlert', 'Login failed. Please try again.', 'error');
+            }
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const username = document.getElementById('registerUsername').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+
+            try {
+                const response = await fetch('/api/users/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showAlert('registerAlert', data.message, 'success');
+                    setTimeout(() => showSection('login'), 1500);
+                } else {
+                    showAlert('registerAlert', data.message, 'error');
+                }
+            } catch (error) {
+                showAlert('registerAlert', 'Registration failed. Please try again.', 'error');
+            }
+        });
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            updateUIForLoggedOutUser();
+            showSection('home');
+        }
+
+        function updateUIForLoggedInUser() {
+            document.getElementById('userInfo').textContent = `Welcome, ${currentUser.username}!`;
+            document.getElementById('userInfo').classList.remove('hidden');
+            document.getElementById('loginBtn').style.display = 'none';
+            document.getElementById('registerBtn').style.display = 'none';
+            document.getElementById('logoutBtn').style.display = 'inline-block';
+            document.getElementById('bookingsBtn').style.display = 'inline-block';
+            document.getElementById('addCarBtn').style.display = 'inline-block';
+        }
+
+        function updateUIForLoggedOutUser() {
+            document.getElementById('userInfo').classList.add('hidden');
+            document.getElementById('loginBtn').style.display = 'inline-block';
+            document.getElementById('registerBtn').style.display = 'inline-block';
+            document.getElementById('logoutBtn').style.display = 'none';
+            document.getElementById('bookingsBtn').style.display = 'none';
+            document.getElementById('addCarBtn').style.display = 'none';
+        }
+
+        // Car management functions
+        async function loadCars() {
+            try {
+                const response = await fetch('/api/cars');
+                const cars = await response.json();
+
+                const carGrid = document.getElementById('carGrid');
+                carGrid.innerHTML = '';
+
+                if (cars.length === 0) {
+                    carGrid.innerHTML = '<p>No cars available. Please add some cars first.</p>';
+                    return;
+                }
+
+                cars.forEach(car => {
+                    const carCard = document.createElement('div');
+                    carCard.className = 'car-card';
+                    carCard.innerHTML = `
+                        <h3>${car.name} ${car.model}</h3>
+                        <p><strong>Year:</strong> ${car.year}</p>
+                        <p class="price">$${car.pricePerDay}/day</p>
+                        <button class="btn btn-primary" onclick="bookCar(${car.id}, '${car.name}', '${car.model}', ${car.pricePerDay})" ${!currentUser ? 'disabled title="Please login to book"' : ''}>
+                            ${currentUser ? 'Book Now' : 'Login to Book'}
+                        </button>
+                        <button class="btn btn-secondary" onclick="deleteCar(${car.id})" style="margin-left: 10px;">Delete</button>
+                    `;
+                    carGrid.appendChild(carCard);
+                });
+            } catch (error) {
+                console.error('Error loading cars:', error);
+            }
+        }
+
+        document.getElementById('addCarForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const carData = {
+                name: document.getElementById('carName').value,
+                model: document.getElementById('carModel').value,
+                year: parseInt(document.getElementById('carYear').value),
+                pricePerDay: parseFloat(document.getElementById('carPrice').value)
+            };
+
+            try {
+                const response = await fetch('/api/cars', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(carData)
+                });
+
+                if (response.ok) {
+                    showAlert('addCarAlert', 'Car added successfully!', 'success');
+                    document.getElementById('addCarForm').reset();
+                    setTimeout(() => {
+                        showSection('cars');
+                        loadCars();
+                    }, 1500);
+                } else {
+                    showAlert('addCarAlert', 'Failed to add car. Please try again.', 'error');
+                }
+            } catch (error) {
+                showAlert('addCarAlert', 'Error adding car. Please try again.', 'error');
+            }
+        });
+
+        async function deleteCar(carId) {
+            if (confirm('Are you sure you want to delete this car?')) {
+                try {
+                    const response = await fetch(`/api/cars/${carId}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (response.ok) {
+                        loadCars(); // Reload the cars list
+                    } else {
+                        alert('Failed to delete car');
+                    }
+                } catch (error) {
+                    alert('Error deleting car');
+                }
+            }
+        }
+
+        // Booking functions
+        function bookCar(carId, carName, carModel, pricePerDay) {
+            if (!currentUser) {
+                alert('Please login to book a car');
+                return;
+            }
+
+            selectedCar = { id: carId, name: carName, model: carModel, pricePerDay: pricePerDay };
+
+            document.getElementById('selectedCarInfo').innerHTML = `
+                <div class="alert alert-success">
+                    <strong>Selected Car:</strong> ${carName} ${carModel} - $${pricePerDay}/day
+                </div>
+            `;
+
+            document.getElementById('customerName').value = currentUser.username;
+            updateTotalCost();
+            showSection('bookCar');
+        }
+
+        document.getElementById('rentalDays').addEventListener('input', updateTotalCost);
+
+        function updateTotalCost() {
+            if (selectedCar) {
+                const days = parseInt(document.getElementById('rentalDays').value) || 1;
+                const total = selectedCar.pricePerDay * days;
+                document.getElementById('totalCost').innerHTML = `<strong>Total Cost: $${total.toFixed(2)}</strong>`;
+            }
+        }
+
+        document.getElementById('bookCarForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const days = parseInt(document.getElementById('rentalDays').value);
+            const totalCost = selectedCar.pricePerDay * days;
+
+            const bookingData = {
+                customerName: document.getElementById('customerName').value,
+                carId: selectedCar.id,
+                bookingDate: document.getElementById('bookingDate').value,
+                totalCost: totalCost
+            };
+
+            try {
+                const response = await fetch('/api/bookings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(bookingData)
+                });
+
+                if (response.ok) {
+                    showAlert('bookCarAlert', 'Car booked successfully!', 'success');
+                    setTimeout(() => {
+                        showSection('bookings');
+                        loadBookings();
+                    }, 1500);
+                } else {
+                    showAlert('bookCarAlert', 'Failed to book car. Please try again.', 'error');
+                }
+            } catch (error) {
+                showAlert('bookCarAlert', 'Error booking car. Please try again.', 'error');
+            }
+        });
+
+        async function loadBookings() {
+            try {
+                const response = await fetch('/api/bookings');
+                const bookings = await response.json();
+
+                const bookingList = document.getElementById('bookingList');
+                bookingList.innerHTML = '';
+
+                if (bookings.length === 0) {
+                    bookingList.innerHTML = '<p>No bookings found.</p>';
+                    return;
+                }
+
+                bookings.forEach(booking => {
+                    const bookingCard = document.createElement('div');
+                    bookingCard.className = 'booking-card';
+                    bookingCard.innerHTML = `
+                        <h4>Booking #${booking.id}</h4>
+                        <p><strong>Customer:</strong> ${booking.customerName}</p>
+                        <p><strong>Car ID:</strong> ${booking.carId}</p>
+                        <p><strong>Date:</strong> ${booking.bookingDate}</p>
+                        <p><strong>Total Cost:</strong> $${booking.totalCost}</p>
+                    `;
+                    bookingList.appendChild(bookingCard);
+                });
+            } catch (error) {
+                console.error('Error loading bookings:', error);
+            }
+        }
+
+        // Utility functions
+        function showAlert(elementId, message, type) {
+            const alertElement = document.getElementById(elementId);
+            alertElement.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            setTimeout(() => {
+                alertElement.innerHTML = '';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
