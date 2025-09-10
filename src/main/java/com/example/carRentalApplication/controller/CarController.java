@@ -25,10 +25,28 @@ public class CarController {
 
     @PostMapping
     public ResponseEntity<Car> addCar(@RequestBody Car car) {
-        System.out.println("Adding car: " + car.getName() + " " + car.getModel());
+        System.out.println("Adding car: " + car.getBrand() + " " + car.getModel());
         Car savedCar = carRepository.save(car);
         System.out.println("Car saved with ID: " + savedCar.getId());
         return ResponseEntity.ok(savedCar);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Car> updateCar(@PathVariable Long id, @RequestBody Car carDetails) {
+        return carRepository.findById(id)
+                .map(car -> {
+                    car.setBrand(carDetails.getBrand());
+                    car.setModel(carDetails.getModel());
+                    car.setYear(carDetails.getYear());
+                    car.setType(carDetails.getType());
+                    car.setSeats(carDetails.getSeats());
+                    car.setFuelType(carDetails.getFuelType());
+                    car.setPricePerDay(carDetails.getPricePerDay());
+                    car.setDescription(carDetails.getDescription());
+                    car.setAvailable(carDetails.isAvailable());
+                    return ResponseEntity.ok(carRepository.save(car));
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/{id}")

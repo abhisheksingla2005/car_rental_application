@@ -12,19 +12,25 @@ public class Car {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    private String brand;
     private String model;
+    private String type;
     private int year;
     private double pricePerDay;
+    private int seats;
+    private String fuelType;
+    private String description;
+    private boolean available = true;
 
     // Constructors
     public Car() {}
 
-    public Car(String name, String model, int year, double pricePerDay) {
-        this.name = name;
+    public Car(String brand, String model, int year, double pricePerDay) {
+        this.brand = brand;
         this.model = model;
         this.year = year;
         this.pricePerDay = pricePerDay;
+        this.available = true;
     }
 
     // Getters and Setters
@@ -36,12 +42,12 @@ public class Car {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getBrand() {
+        return brand;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setBrand(String brand) {
+        this.brand = brand;
     }
 
     public String getModel() {
@@ -50,6 +56,14 @@ public class Car {
 
     public void setModel(String model) {
         this.model = model;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public int getYear() {
@@ -66,5 +80,37 @@ public class Car {
 
     public void setPricePerDay(double pricePerDay) {
         this.pricePerDay = pricePerDay;
+    }
+
+    public int getSeats() {
+        return seats;
+    }
+
+    public void setSeats(int seats) {
+        this.seats = seats;
+    }
+
+    public String getFuelType() {
+        return fuelType;
+    }
+
+    public void setFuelType(String fuelType) {
+        this.fuelType = fuelType;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public boolean isAvailable() {
+        return available;
+    }
+
+    public void setAvailable(boolean available) {
+        this.available = available;
     }
 }

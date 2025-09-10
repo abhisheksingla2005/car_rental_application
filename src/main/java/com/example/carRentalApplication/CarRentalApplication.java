@@ -19,9 +19,9 @@ public class CarRentalApplication {
 
 	@EventListener(ApplicationReadyEvent.class)
 	public void doSomethingAfterStartup() {
-		int port = webServerAppCtxt.getWebServer().getPort();
 		System.out.println("Car Rental Application has started successfully!");
-		System.out.println("Application is running on: http://localhost:" + port);
-		System.out.println("Open your browser and navigate to the URL above to access the car rental application!");
+		System.out.println("Application is running on: http://localhost:8081");
+		System.out.println("=== LOGIN CREDENTIALS ===");
+		System.out.println("Admin Dashboard: admin@gmail.com / admin123");
 	}
 }

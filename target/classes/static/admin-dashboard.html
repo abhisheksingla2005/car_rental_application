@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Autexa Car Rental</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        .header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo h1 {
+            color: #333;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .admin-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-left: 0.5rem;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: #333;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #555;
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .dashboard-header {
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-header h1 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-header p {
+            color: #666;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .btn {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: 500;
+        }
+
+        .btn:hover {
+            background: #555;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #333;
+            border: 2px solid #333;
+        }
+
+        .btn-outline:hover {
+            background: #333;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .cars-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .car-card {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .car-card:hover {
+            border-color: #333;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .car-image {
+            height: 180px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+        }
+
+        .car-info {
+            padding: 1.5rem;
+        }
+
+        .car-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .car-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .car-price {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .car-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .data-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-confirmed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-available {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-rented {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cars-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .data-table {
+                font-size: 0.8rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <h1>Autexa <span class="admin-badge">Admin</span></h1>
+            </div>
+            <div class="user-menu">
+                <div class="user-info">
+                    <div class="user-avatar">A</div>
+                    <span>Welcome, Admin!</span>
+                </div>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="dashboard-header">
+            <h1>Admin Dashboard</h1>
+            <p>Manage cars, bookings, and users</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-car"></i>
+                </div>
+                <div class="stat-number" id="totalCars">10</div>
+                <div class="stat-label">Total Cars</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="stat-number" id="totalBookings">5</div>
+                <div class="stat-label">Total Bookings</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-number" id="totalUsers">25</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-rupee-sign"></i>
+                </div>
+                <div class="stat-number">₹<span id="totalRevenue">125000</span></div>
+                <div class="stat-label">Total Revenue</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">Car Management</h2>
+                <button class="btn" onclick="openAddCarModal()">
+                    <i class="fas fa-plus"></i> Add New Car
+                </button>
+            </div>
+            <div class="cars-grid" id="carsGrid">
+                <!-- Cars will be loaded here -->
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">Recent Bookings</h2>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Booking ID</th>
+                            <th>Customer</th>
+                            <th>Car</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Total Cost</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bookingsTable">
+                        <tr>
+                            <td>#BK001</td>
+                            <td>John Doe</td>
+                            <td>Toyota Camry</td>
+                            <td>2025-01-15</td>
+                            <td>2025-01-20</td>
+                            <td>₹12,500</td>
+                            <td><span class="status-badge status-confirmed">Confirmed</span></td>
+                            <td>
+                                <button class="btn btn-success" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">Approve</button>
+                                <button class="btn btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">Cancel</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>#BK002</td>
+                            <td>Jane Smith</td>
+                            <td>Honda Civic</td>
+                            <td>2025-01-18</td>
+                            <td>2025-01-22</td>
+                            <td>₹8,800</td>
+                            <td><span class="status-badge status-pending">Pending</span></td>
+                            <td>
+                                <button class="btn btn-success" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">Approve</button>
+                                <button class="btn btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">Cancel</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Car Modal -->
+    <div id="addCarModal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 1.5rem;">Add New Car</h3>
+            <form id="addCarForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="carBrand">Brand</label>
+                        <input type="text" id="carBrand" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="carModel">Model</label>
+                        <input type="text" id="carModel" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="carYear">Year</label>
+                        <input type="number" id="carYear" min="2000" max="2025" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="carSeats">Seats</label>
+                        <select id="carSeats" required>
+                            <option value="">Select Seats</option>
+                            <option value="2">2 Seats</option>
+                            <option value="4">4 Seats</option>
+                            <option value="5">5 Seats</option>
+                            <option value="7">7 Seats</option>
+                            <option value="8">8 Seats</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="carType">Type</label>
+                        <select id="carType" required>
+                            <option value="">Select Type</option>
+                            <option value="Sedan">Sedan</option>
+                            <option value="SUV">SUV</option>
+                            <option value="Hatchback">Hatchback</option>
+                            <option value="Coupe">Coupe</option>
+                            <option value="Convertible">Convertible</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="carFuelType">Fuel Type</label>
+                        <select id="carFuelType" required>
+                            <option value="">Select Fuel Type</option>
+                            <option value="Petrol">Petrol</option>
+                            <option value="Diesel">Diesel</option>
+                            <option value="Electric">Electric</option>
+                            <option value="Hybrid">Hybrid</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="carPrice">Price per Day (₹)</label>
+                    <input type="number" id="carPrice" min="500" step="100" required>
+                </div>
+                <div class="form-group">
+                    <label for="carDescription">Description</label>
+                    <textarea id="carDescription" rows="3" placeholder="Brief description of the car..."></textarea>
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn" style="flex: 1;">Add Car</button>
+                    <button type="button" class="btn btn-outline" onclick="closeAddCarModal()" style="flex: 1;">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Simplified security check - verify admin access
+        async function checkAdminAccess() {
+            try {
+                const response = await fetch('/api/auth/user');
+                const userData = await response.json();
+
+                if (!userData.authenticated) {
+                    window.location.href = '/login.html';
+                    return false;
+                }
+
+                if (userData.role !== 'ADMIN') {
+                    window.location.href = '/login.html?error=unauthorized';
+                    return false;
+                }
+
+                // Update UI with user info
+                document.querySelector('.user-avatar').textContent = userData.firstName ? userData.firstName.charAt(0).toUpperCase() : 'A';
+                document.querySelector('.user-info span').textContent = `Welcome, ${userData.firstName || 'Admin'}!`;
+                return true;
+            } catch (error) {
+                console.error('Access check failed:', error);
+                window.location.href = '/login.html';
+                return false;
+            }
+        }
+
+        // Initialize page security
+        document.addEventListener('DOMContentLoaded', async function() {
+            const hasAccess = await checkAdminAccess();
+            if (hasAccess) {
+                loadDashboardData();
+            }
+        });
+
+        let cars = [];
+        let bookings = [];
+        let users = [];
+
+        function loadDashboardData() {
+            loadStats();
+            loadCars();
+            loadBookings();
+        }
+
+        function loadStats() {
+            fetch('/api/dashboard/stats')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('totalCars').textContent = data.totalCars;
+                    document.getElementById('totalBookings').textContent = data.totalBookings;
+                    document.getElementById('totalUsers').textContent = data.totalUsers;
+                    document.getElementById('totalRevenue').textContent = formatCurrency(data.totalRevenue);
+                })
+                .catch(error => {
+                    console.error('Error loading stats:', error);
+                    // Fallback to 0 values if API fails
+                    document.getElementById('totalCars').textContent = '0';
+                    document.getElementById('totalBookings').textContent = '0';
+                    document.getElementById('totalUsers').textContent = '0';
+                    document.getElementById('totalRevenue').textContent = '0';
+                });
+        }
+
+        function formatCurrency(amount) {
+            if (amount === null || amount === undefined) return '0';
+            return new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount).replace('₹', '');
+        }
+
+        function loadCars() {
+            fetch('/api/cars')
+                .then(response => response.json())
+                .then(data => {
+                    cars = data;
+                    renderCars();
+                })
+                .catch(error => {
+                    console.error('Error loading cars:', error);
+                    document.getElementById('carsGrid').innerHTML = '<p>Error loading cars. Please refresh the page.</p>';
+                });
+        }
+
+        function loadBookings() {
+            fetch('/api/bookings')
+                .then(response => response.json())
+                .then(data => {
+                    bookings = data;
+                    renderBookings();
+                })
+                .catch(error => {
+                    console.error('Error loading bookings:', error);
+                    document.getElementById('bookingsTable').innerHTML = '<tr><td colspan="8">Error loading bookings. Please refresh the page.</td></tr>';
+                });
+        }
+
+        function renderCars() {
+            const carsGrid = document.getElementById('carsGrid');
+
+            if (cars.length === 0) {
+                carsGrid.innerHTML = '<p>No cars found. Add your first car using the "Add New Car" button.</p>';
+                return;
+            }
+
+            carsGrid.innerHTML = cars.map(car => `
+                <div class="car-card">
+                    <div class="car-image">
+                        <i class="fas fa-car"></i>
+                    </div>
+                    <div class="car-info">
+                        <div class="car-name">${car.brand} ${car.model}</div>
+                        <div class="car-details">
+                            <div><i class="fas fa-calendar"></i> ${car.year}</div>
+                            <div><i class="fas fa-users"></i> ${car.seats} seats</div>
+                            <div><i class="fas fa-car"></i> ${car.type}</div>
+                            <div><i class="fas fa-gas-pump"></i> ${car.fuelType}</div>
+                        </div>
+                        <div class="car-price">₹${car.pricePerDay}/day</div>
+                        <div class="car-actions">
+                            <button class="btn ${car.available ? 'btn-outline' : 'btn-success'}"
+                                    onclick="toggleCarAvailability(${car.id})">
+                                ${car.available ? 'Make Unavailable' : 'Make Available'}
+                            </button>
+                            <button class="btn btn-danger" onclick="deleteCar(${car.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderBookings() {
+            const bookingsTable = document.getElementById('bookingsTable');
+
+            if (bookings.length === 0) {
+                bookingsTable.innerHTML = '<tr><td colspan="8">No bookings found.</td></tr>';
+                return;
+            }
+
+            bookingsTable.innerHTML = bookings.map(booking => `
+                <tr>
+                    <td>#BK${String(booking.id).padStart(3, '0')}</td>
+                    <td>${booking.userName || 'Unknown User'}</td>
+                    <td>${booking.carModel || 'Unknown Car'}</td>
+                    <td>${booking.startDate}</td>
+                    <td>${booking.endDate}</td>
+                    <td>₹${booking.totalCost ? booking.totalCost.toLocaleString('en-IN') : '0'}</td>
+                    <td><span class="status-badge status-${booking.status.toLowerCase()}">${booking.status}</span></td>
+                    <td>
+                        ${booking.status === 'PENDING' ? `
+                            <button class="btn btn-success" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" onclick="updateBookingStatus(${booking.id}, 'CONFIRMED')">Approve</button>
+                            <button class="btn btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" onclick="updateBookingStatus(${booking.id}, 'CANCELLED')">Cancel</button>
+                        ` : `
+                            <span style="color: #666; font-size: 0.8rem;">${booking.status}</span>
+                        `}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateBookingStatus(bookingId, status) {
+            fetch(`/api/bookings/${bookingId}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status: status })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(`Booking ${status.toLowerCase()} successfully!`);
+                loadBookings(); // Reload bookings to reflect changes
+                loadStats(); // Reload stats to update revenue
+            })
+            .catch(error => {
+                console.error('Error updating booking status:', error);
+                alert('Error updating booking status. Please try again.');
+            });
+        }
+
+        function openAddCarModal() {
+            document.getElementById('addCarModal').style.display = 'flex';
+        }
+
+        function closeAddCarModal() {
+            document.getElementById('addCarModal').style.display = 'none';
+            document.getElementById('addCarForm').reset();
+        }
+
+        function toggleCarAvailability(carId) {
+            const car = cars.find(c => c.id === carId);
+            if (car) {
+                fetch(`/api/cars/${carId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        ...car,
+                        available: !car.available
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    loadCars(); // Reload cars to reflect changes
+                })
+                .catch(error => {
+                    console.error('Error updating car availability:', error);
+                    alert('Error updating car availability. Please try again.');
+                });
+            }
+        }
+
+        function deleteCar(carId) {
+            if (confirm('Are you sure you want to delete this car?')) {
+                fetch(`/api/cars/${carId}`, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        loadCars(); // Reload cars to reflect changes
+                        loadStats(); // Update stats
+                        alert('Car deleted successfully!');
+                    } else {
+                        alert('Error deleting car. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting car:', error);
+                    alert('Error deleting car. Please try again.');
+                });
+            }
+        }
+
+        document.getElementById('addCarForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const newCar = {
+                brand: document.getElementById('carBrand').value,
+                model: document.getElementById('carModel').value,
+                year: parseInt(document.getElementById('carYear').value),
+                seats: parseInt(document.getElementById('carSeats').value),
+                type: document.getElementById('carType').value,
+                fuelType: document.getElementById('carFuelType').value,
+                pricePerDay: parseInt(document.getElementById('carPrice').value),
+                description: document.getElementById('carDescription').value,
+                available: true
+            };
+
+            fetch('/api/cars', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(newCar)
+            })
+            .then(response => response.json())
+            .then(data => {
+                loadCars(); // Reload cars to reflect changes
+                loadStats(); // Update stats
+                closeAddCarModal();
+                alert('Car added successfully!');
+            })
+            .catch(error => {
+                console.error('Error adding car:', error);
+                alert('Error adding car. Please try again.');
+            });
+        });
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                fetch('/api/auth/logout', {
+                    method: 'POST'
+                }).then(() => {
+                    window.location.href = '/login.html?logout=true';
+                }).catch(() => {
+                    window.location.href = '/login.html';
+                });
+            }
+        }
+
+        // Initialize dashboard when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboardData();
+
+            // Refresh data every 30 seconds
+            setInterval(loadStats, 30000);
+        });
+    </script>
+</body>
+</html>

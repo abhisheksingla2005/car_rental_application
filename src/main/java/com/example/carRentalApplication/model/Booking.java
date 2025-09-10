@@ -4,26 +4,33 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "bookings")
 public class Booking {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String customerName;
+    private Long userId;
     private Long carId;
-    private LocalDate bookingDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private String status;
+    private String notes;
+    private String carModel;
+    private String userName;
     private double totalCost;
+    private String customerName;
+    private String carBrand;
 
     // Constructors
     public Booking() {}
 
-    public Booking(String customerName, Long carId, LocalDate bookingDate, double totalCost) {
-        this.customerName = customerName;
+    public Booking(Long userId, Long carId, LocalDate startDate, LocalDate endDate) {
+        this.userId = userId;
         this.carId = carId;
-        this.bookingDate = bookingDate;
-        this.totalCost = totalCost;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.status = "PENDING";
     }
 
     // Getters and Setters
@@ -35,12 +42,12 @@ public class Booking {
         this.id = id;
     }
 
-    public String getCustomerName() {
-        return customerName;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setCustomerName(String customerName) {
-        this.customerName = customerName;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public Long getCarId() {
@@ -51,12 +58,52 @@ public class Booking {
         this.carId = carId;
     }
 
-    public LocalDate getBookingDate() {
-        return bookingDate;
+    public LocalDate getStartDate() {
+        return startDate;
     }
 
-    public void setBookingDate(LocalDate bookingDate) {
-        this.bookingDate = bookingDate;
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    public String getCarModel() {
+        return carModel;
+    }
+
+    public void setCarModel(String carModel) {
+        this.carModel = carModel;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public double getTotalCost() {
@@ -65,5 +112,21 @@ public class Booking {
 
     public void setTotalCost(double totalCost) {
         this.totalCost = totalCost;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
+    public String getCarBrand() {
+        return carBrand;
+    }
+
+    public void setCarBrand(String carBrand) {
+        this.carBrand = carBrand;
     }
 }

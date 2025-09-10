@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -26,20 +27,47 @@ public class UserController {
     public ResponseEntity<Map<String, String>> registerUser(@RequestBody User user) {
         Map<String, String> response = new HashMap<>();
 
+        // Basic validation
+        if (user.getUsername() == null || user.getUsername().trim().isEmpty()) {
+            response.put("message", "Username is required!");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        if (user.getEmail() == null || user.getEmail().trim().isEmpty()) {
+            response.put("message", "Email is required!");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        if (user.getPassword() == null || user.getPassword().trim().isEmpty()) {
+            response.put("message", "Password is required!");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        // Check if username already exists
         if (userRepository.existsByUsername(user.getUsername())) {
             response.put("message", "Username already exists!");
             return ResponseEntity.badRequest().body(response);
         }
 
+        // Check if email already exists
         if (userRepository.existsByEmail(user.getEmail())) {
             response.put("message", "Email already exists!");
             return ResponseEntity.badRequest().body(response);
         }
 
+        // Set default role if not provided
+        if (user.getRole() == null) {
+            user.setRole(User.Role.USER);
+        }
+
+        // Encode password
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.save(user);
+
+        // Save user
+        User savedUser = userRepository.save(user);
 
         response.put("message", "User registered successfully!");
+        response.put("userId", savedUser.getId().toString());
         return ResponseEntity.ok(response);
     }
 
@@ -49,6 +77,18 @@ public class UserController {
 
         String username = loginData.get("username");
         String password = loginData.get("password");
+
+        if (username == null || username.trim().isEmpty()) {
+            response.put("success", false);
+            response.put("message", "Username is required!");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        if (password == null || password.trim().isEmpty()) {
+            response.put("success", false);
+            response.put("message", "Password is required!");
+            return ResponseEntity.badRequest().body(response);
+        }
 
         Optional<User> userOpt = userRepository.findByUsername(username);
 
@@ -60,13 +100,123 @@ public class UserController {
                 "id", user.getId(),
                 "username", user.getUsername(),
                 "email", user.getEmail(),
-                "role", user.getRole()
+                "role", user.getRole().toString(),
+                "firstName", user.getFirstName() != null ? user.getFirstName() : "",
+                "lastName", user.getLastName() != null ? user.getLastName() : "",
+                "phoneNumber", user.getPhoneNumber() != null ? user.getPhoneNumber() : ""
             ));
             return ResponseEntity.ok(response);
         } else {
             response.put("success", false);
             response.put("message", "Invalid username or password!");
             return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    @GetMapping
+    public ResponseEntity<List<User>> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        // Remove passwords from response for security
+        users.forEach(user -> user.setPassword(""));
+        return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+        Optional<User> userOpt = userRepository.findById(id);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            user.setPassword(""); // Remove password from response
+            return ResponseEntity.ok(user);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Map<String, String>> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
+        Map<String, String> response = new HashMap<>();
+
+        Optional<User> userOpt = userRepository.findById(id);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+
+            // Update only non-null fields
+            if (updatedUser.getEmail() != null && !updatedUser.getEmail().trim().isEmpty()) {
+                // Check if email is already taken by another user
+                if (userRepository.existsByEmail(updatedUser.getEmail()) &&
+                    !user.getEmail().equals(updatedUser.getEmail())) {
+                    response.put("message", "Email already exists!");
+                    return ResponseEntity.badRequest().body(response);
+                }
+                user.setEmail(updatedUser.getEmail());
+            }
+
+            if (updatedUser.getFirstName() != null) {
+                user.setFirstName(updatedUser.getFirstName());
+            }
+
+            if (updatedUser.getLastName() != null) {
+                user.setLastName(updatedUser.getLastName());
+            }
+
+            if (updatedUser.getPhoneNumber() != null) {
+                user.setPhoneNumber(updatedUser.getPhoneNumber());
+            }
+
+            if (updatedUser.getRole() != null) {
+                user.setRole(updatedUser.getRole());
+            }
+
+            // Update password if provided
+            if (updatedUser.getPassword() != null && !updatedUser.getPassword().trim().isEmpty()) {
+                user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+            }
+
+            userRepository.save(user);
+            response.put("message", "User updated successfully!");
+            return ResponseEntity.ok(response);
+        } else {
+            response.put("message", "User not found!");
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping("/{id}/role")
+    public ResponseEntity<Map<String, String>> updateUserRole(@PathVariable Long id, @RequestBody Map<String, String> roleData) {
+        Map<String, String> response = new HashMap<>();
+
+        Optional<User> userOpt = userRepository.findById(id);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            String newRole = roleData.get("role");
+
+            if (newRole != null && (newRole.equals("USER") || newRole.equals("ADMIN"))) {
+                user.setRole(newRole.equals("ADMIN") ? User.Role.ADMIN : User.Role.USER);
+                userRepository.save(user);
+                response.put("message", "User role updated successfully!");
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("message", "Invalid role specified!");
+                return ResponseEntity.badRequest().body(response);
+            }
+        } else {
+            response.put("message", "User not found!");
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Map<String, String>> deleteUser(@PathVariable Long id) {
+        Map<String, String> response = new HashMap<>();
+
+        if (userRepository.existsById(id)) {
+            userRepository.deleteById(id);
+            response.put("message", "User deleted successfully!");
+            return ResponseEntity.ok(response);
+        } else {
+            response.put("message", "User not found!");
+            return ResponseEntity.notFound().build();
         }
     }
 }
