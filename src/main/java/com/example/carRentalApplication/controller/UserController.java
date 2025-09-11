@@ -27,48 +27,69 @@ public class UserController {
     public ResponseEntity<Map<String, String>> registerUser(@RequestBody User user) {
         Map<String, String> response = new HashMap<>();
 
-        // Basic validation
-        if (user.getUsername() == null || user.getUsername().trim().isEmpty()) {
-            response.put("message", "Username is required!");
-            return ResponseEntity.badRequest().body(response);
+        try {
+            // Basic validation
+            if (user.getEmail() == null || user.getEmail().trim().isEmpty()) {
+                response.put("message", "Email is required!");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            if (user.getPassword() == null || user.getPassword().trim().isEmpty()) {
+                response.put("message", "Password is required!");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            if (user.getFirstName() == null || user.getFirstName().trim().isEmpty()) {
+                response.put("message", "First Name is required!");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            if (user.getLastName() == null || user.getLastName().trim().isEmpty()) {
+                response.put("message", "Last Name is required!");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            // Set username as email if not provided
+            if (user.getUsername() == null || user.getUsername().trim().isEmpty()) {
+                user.setUsername(user.getEmail());
+            }
+
+            // Check if email already exists
+            if (userRepository.existsByEmail(user.getEmail())) {
+                response.put("message", "Email already exists!");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            // Check if username already exists
+            if (userRepository.existsByUsername(user.getUsername())) {
+                response.put("message", "Username already exists!");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            // Set default role if not provided
+            if (user.getRole() == null) {
+                user.setRole(User.Role.USER);
+            }
+
+            // Encode password
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+            // Save user to database
+            User savedUser = userRepository.save(user);
+
+            System.out.println("User saved to database: " + savedUser.getEmail());
+
+            response.put("message", "User registered successfully!");
+            response.put("userId", savedUser.getId().toString());
+            response.put("redirect", "/login.html?registered=true");
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            System.err.println("Error saving user: " + e.getMessage());
+            e.printStackTrace();
+            response.put("message", "Registration failed: " + e.getMessage());
+            return ResponseEntity.status(500).body(response);
         }
-
-        if (user.getEmail() == null || user.getEmail().trim().isEmpty()) {
-            response.put("message", "Email is required!");
-            return ResponseEntity.badRequest().body(response);
-        }
-
-        if (user.getPassword() == null || user.getPassword().trim().isEmpty()) {
-            response.put("message", "Password is required!");
-            return ResponseEntity.badRequest().body(response);
-        }
-
-        // Check if username already exists
-        if (userRepository.existsByUsername(user.getUsername())) {
-            response.put("message", "Username already exists!");
-            return ResponseEntity.badRequest().body(response);
-        }
-
-        // Check if email already exists
-        if (userRepository.existsByEmail(user.getEmail())) {
-            response.put("message", "Email already exists!");
-            return ResponseEntity.badRequest().body(response);
-        }
-
-        // Set default role if not provided
-        if (user.getRole() == null) {
-            user.setRole(User.Role.USER);
-        }
-
-        // Encode password
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-
-        // Save user
-        User savedUser = userRepository.save(user);
-
-        response.put("message", "User registered successfully!");
-        response.put("userId", savedUser.getId().toString());
-        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/login")

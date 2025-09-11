@@ -49,6 +49,8 @@ public class BookingController {
         Map<String, Object> response = new HashMap<>();
 
         try {
+            System.out.println("Creating booking with data: " + bookingData);
+
             // Extract booking data
             Long carId = Long.valueOf(bookingData.get("carId").toString());
             Long userId = Long.valueOf(bookingData.get("userId").toString());
@@ -114,24 +116,30 @@ public class BookingController {
             booking.setNotes(notes);
 
             // Set additional fields for display purposes
-            booking.setCustomerName(user.getUsername());
+            booking.setCustomerName(user.getFirstName() + " " + user.getLastName());
             booking.setCarBrand(car.getBrand());
             booking.setCarModel(car.getModel());
-            booking.setUserName(user.getUsername());
+            booking.setUserName(user.getFirstName() + " " + user.getLastName());
 
-            // Save booking
+            // Save booking to database
+            System.out.println("Saving booking to database...");
             Booking savedBooking = bookingRepository.save(booking);
+            System.out.println("Booking saved with ID: " + savedBooking.getId());
 
             // Update car availability
             car.setAvailable(false);
             carRepository.save(car);
+            System.out.println("Car availability updated to false for car ID: " + carId);
 
             response.put("success", true);
             response.put("message", "Booking created successfully!");
             response.put("booking", savedBooking);
+            response.put("bookingId", savedBooking.getId());
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
+            System.err.println("Error creating booking: " + e.getMessage());
+            e.printStackTrace();
             response.put("success", false);
             response.put("message", "Error creating booking: " + e.getMessage());
             return ResponseEntity.badRequest().body(response);

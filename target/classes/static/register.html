@@ -347,31 +347,49 @@
         const phoneRegex = /^[+]?[0-9]{10,14}$/;
         const nameRegex = /^[a-zA-Z\s]{2,30}$/;
 
-        // Real-time validation
-        document.getElementById('firstName').addEventListener('input', function() {
-            validateName(this.value, 'firstName');
-        });
+        // Password strength validation
+        function checkPasswordStrength(password) {
+            const strengthElement = document.getElementById('passwordStrength');
+            const fillElement = document.getElementById('strengthFill');
+            const textElement = document.getElementById('strengthText');
 
-        document.getElementById('lastName').addEventListener('input', function() {
-            validateName(this.value, 'lastName');
-        });
+            if (password.length === 0) {
+                strengthElement.style.display = 'none';
+                return;
+            }
 
-        document.getElementById('email').addEventListener('input', function() {
-            validateEmail(this.value);
-        });
+            strengthElement.style.display = 'block';
 
-        document.getElementById('phone').addEventListener('input', function() {
-            validatePhone(this.value);
-        });
+            let strength = 0;
+            let requirements = [];
 
-        document.getElementById('password').addEventListener('input', function() {
-            validatePassword(this.value);
-            checkPasswordStrength(this.value);
-        });
+            if (password.length >= 8) strength++;
+            else requirements.push('at least 8 characters');
 
-        document.getElementById('confirmPassword').addEventListener('input', function() {
-            validateConfirmPassword(this.value);
-        });
+            if (/[A-Z]/.test(password)) strength++;
+            else requirements.push('an uppercase letter');
+
+            if (/[a-z]/.test(password)) strength++;
+            else requirements.push('a lowercase letter');
+
+            if (/[0-9]/.test(password)) strength++;
+            else requirements.push('a number');
+
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+            else requirements.push('a special character');
+
+            fillElement.className = 'strength-fill';
+            if (strength < 2) {
+                fillElement.classList.add('strength-weak');
+                textElement.textContent = 'Weak - Need: ' + requirements.slice(0, 2).join(', ');
+            } else if (strength < 4) {
+                fillElement.classList.add('strength-medium');
+                textElement.textContent = 'Medium - Need: ' + requirements.slice(0, 1).join(', ');
+            } else {
+                fillElement.classList.add('strength-strong');
+                textElement.textContent = 'Strong password';
+            }
+        }
 
         function validateName(name, fieldName) {
             const input = document.getElementById(fieldName);
@@ -412,7 +430,7 @@
             if (!phone) {
                 showFieldError(phoneInput, phoneError, 'Phone number is required');
                 return false;
-            } else if (!phoneRegex.test(phone.replace(/\s+/g, ''))) {
+            } else if (!phoneRegex.test(phone)) {
                 showFieldError(phoneInput, phoneError, 'Please enter a valid phone number');
                 return false;
             } else {
@@ -431,9 +449,6 @@
             } else if (password.length < 8) {
                 showFieldError(passwordInput, passwordError, 'Password must be at least 8 characters long');
                 return false;
-            } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
-                showFieldError(passwordInput, passwordError, 'Password must contain at least one uppercase letter, one lowercase letter, and one number');
-                return false;
             } else {
                 hideFieldError(passwordInput, passwordError);
                 return true;
@@ -441,9 +456,9 @@
         }
 
         function validateConfirmPassword(confirmPassword) {
-            const password = document.getElementById('password').value;
             const confirmPasswordInput = document.getElementById('confirmPassword');
             const confirmPasswordError = document.getElementById('confirmPasswordError');
+            const password = document.getElementById('password').value;
 
             if (!confirmPassword) {
                 showFieldError(confirmPasswordInput, confirmPasswordError, 'Please confirm your password');
@@ -454,48 +469,6 @@
             } else {
                 hideFieldError(confirmPasswordInput, confirmPasswordError);
                 return true;
-            }
-        }
-
-        function checkPasswordStrength(password) {
-            const strengthIndicator = document.getElementById('passwordStrength');
-            const strengthFill = document.getElementById('strengthFill');
-            const strengthText = document.getElementById('strengthText');
-
-            if (!password) {
-                strengthIndicator.style.display = 'none';
-                return;
-            }
-
-            strengthIndicator.style.display = 'block';
-
-            let score = 0;
-            let feedback = '';
-
-            // Length check
-            if (password.length >= 8) score += 1;
-            if (password.length >= 12) score += 1;
-
-            // Character variety
-            if (/[a-z]/.test(password)) score += 1;
-            if (/[A-Z]/.test(password)) score += 1;
-            if (/\d/.test(password)) score += 1;
-            if (/[^a-zA-Z\d]/.test(password)) score += 1;
-
-            strengthFill.className = 'strength-fill';
-
-            if (score < 3) {
-                strengthFill.classList.add('strength-weak');
-                strengthText.textContent = 'Weak password';
-                strengthText.style.color = '#e74c3c';
-            } else if (score < 5) {
-                strengthFill.classList.add('strength-medium');
-                strengthText.textContent = 'Medium strength';
-                strengthText.style.color = '#f39c12';
-            } else {
-                strengthFill.classList.add('strength-strong');
-                strengthText.textContent = 'Strong password';
-                strengthText.style.color = '#27ae60';
             }
         }
 
@@ -510,58 +483,135 @@
             errorElement.style.display = 'none';
         }
 
-        function showMessage(element, message) {
-            element.textContent = message;
-            element.style.display = 'block';
-            setTimeout(() => {
-                element.style.display = 'none';
-            }, 5000);
+        function hideMessages() {
+            successMessage.style.display = 'none';
+            errorMessage.style.display = 'none';
         }
 
+        // Real-time validation event listeners
+        document.getElementById('firstName').addEventListener('input', function() {
+            validateName(this.value, 'firstName');
+        });
+
+        document.getElementById('lastName').addEventListener('input', function() {
+            validateName(this.value, 'lastName');
+        });
+
+        document.getElementById('email').addEventListener('input', function() {
+            validateEmail(this.value);
+        });
+
+        document.getElementById('phone').addEventListener('input', function() {
+            validatePhone(this.value);
+        });
+
+        document.getElementById('password').addEventListener('input', function() {
+            validatePassword(this.value);
+            checkPasswordStrength(this.value);
+        });
+
+        document.getElementById('confirmPassword').addEventListener('input', function() {
+            validateConfirmPassword(this.value);
+        });
+
+        // Form submission
         registerForm.addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            const firstName = document.getElementById('firstName').value;
-            const lastName = document.getElementById('lastName').value;
-            const email = document.getElementById('email').value;
-            const phone = document.getElementById('phone').value;
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
+            hideMessages();
+
+            // Get form data
+            const formData = {
+                firstName: document.getElementById('firstName').value.trim(),
+                lastName: document.getElementById('lastName').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                phoneNumber: document.getElementById('phone').value.trim(),
+                password: document.getElementById('password').value,
+                confirmPassword: document.getElementById('confirmPassword').value
+            };
 
             // Validate all fields
-            const isFirstNameValid = validateName(firstName, 'firstName');
-            const isLastNameValid = validateName(lastName, 'lastName');
-            const isEmailValid = validateEmail(email);
-            const isPhoneValid = validatePhone(phone);
-            const isPasswordValid = validatePassword(password);
-            const isConfirmPasswordValid = validateConfirmPassword(confirmPassword);
+            const isFirstNameValid = validateName(formData.firstName, 'firstName');
+            const isLastNameValid = validateName(formData.lastName, 'lastName');
+            const isEmailValid = validateEmail(formData.email);
+            const isPhoneValid = validatePhone(formData.phoneNumber);
+            const isPasswordValid = validatePassword(formData.password);
+            const isConfirmPasswordValid = validateConfirmPassword(formData.confirmPassword);
 
             if (!isFirstNameValid || !isLastNameValid || !isEmailValid ||
                 !isPhoneValid || !isPasswordValid || !isConfirmPasswordValid) {
+                errorMessage.textContent = 'Please fix the validation errors above';
+                errorMessage.style.display = 'block';
                 return;
             }
 
             // Show loading state
             registerBtn.disabled = true;
-            registerForm.style.display = 'none';
+            registerBtn.textContent = 'Creating Account...';
             loading.style.display = 'block';
 
             try {
-                // Simulate API call
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                // Send registration request to API
+                const response = await fetch('/api/users/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        firstName: formData.firstName,
+                        lastName: formData.lastName,
+                        email: formData.email,
+                        phoneNumber: formData.phoneNumber,
+                        password: formData.password,
+                        username: formData.email // Use email as username
+                    })
+                });
 
-                showMessage(successMessage, 'Account created successfully! Redirecting to login page...');
-                setTimeout(() => {
-                    window.location.href = 'login.html';
-                }, 2000);
+                const result = await response.json();
 
+                if (response.ok) {
+                    // Registration successful
+                    successMessage.innerHTML = `
+                        <strong>Registration Successful!</strong><br>
+                        ${result.message}<br>
+                        Redirecting to login page...
+                    `;
+                    successMessage.style.display = 'block';
+
+                    // Reset form
+                    registerForm.reset();
+                    document.getElementById('passwordStrength').style.display = 'none';
+
+                    // Redirect to login page after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = '/login.html?registered=true';
+                    }, 2000);
+                } else {
+                    // Registration failed
+                    errorMessage.innerHTML = `<strong>Registration Failed:</strong><br>${result.message}`;
+                    errorMessage.style.display = 'block';
+                }
             } catch (error) {
-                showMessage(errorMessage, 'Registration failed. Please try again.');
-
-                // Reset form state
+                console.error('Registration error:', error);
+                errorMessage.innerHTML = `
+                    <strong>Registration Failed:</strong><br>
+                    Network error. Please check your internet connection and try again.
+                `;
+                errorMessage.style.display = 'block';
+            } finally {
+                // Reset button state
                 registerBtn.disabled = false;
-                registerForm.style.display = 'block';
+                registerBtn.textContent = 'Create Account';
                 loading.style.display = 'none';
+            }
+        });
+
+        // Show success message if coming from successful registration
+        window.addEventListener('load', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('success') === 'true') {
+                successMessage.innerHTML = '<strong>Welcome!</strong><br>Your account has been created successfully.';
+                successMessage.style.display = 'block';
             }
         });
     </script>

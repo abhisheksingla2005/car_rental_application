@@ -414,43 +414,86 @@
     <script>
         let selectedCarId = null;
         let userBookings = [];
+        let loadedCars = [];
 
-        // Sample data
-        const sampleCars = [
-            { id: 1, brand: "Toyota", model: "Camry", year: 2023, pricePerDay: 2500, seats: 5, fuelType: "Petrol", available: true },
-            { id: 2, brand: "Honda", model: "Civic", year: 2023, pricePerDay: 2200, seats: 5, fuelType: "Petrol", available: true },
-            { id: 3, brand: "BMW", model: "X5", year: 2023, pricePerDay: 5500, seats: 7, fuelType: "Diesel", available: true },
-            { id: 4, brand: "Audi", model: "A4", year: 2023, pricePerDay: 4500, seats: 5, fuelType: "Petrol", available: true }
-        ];
+        // Load cars from database
+        async function loadCars() {
+            try {
+                const response = await fetch('/api/cars');
+                const cars = await response.json();
+                loadedCars = cars; // Store for booking reference
 
-        function loadCars() {
-            const carsGrid = document.getElementById('carsGrid');
-            carsGrid.innerHTML = '';
+                const carsGrid = document.getElementById('carsGrid');
+                carsGrid.innerHTML = '';
 
-            sampleCars.forEach(car => {
-                if (car.available) {
-                    const carCard = document.createElement('div');
-                    carCard.className = 'car-card';
-                    carCard.innerHTML = `
-                        <div class="car-image">
-                            <i class="fas fa-car"></i>
-                        </div>
-                        <div class="car-info">
-                            <div class="car-name">${car.brand} ${car.model}</div>
-                            <div class="car-details">
-                                <span><i class="fas fa-calendar"></i> ${car.year}</span>
-                                <span><i class="fas fa-users"></i> ${car.seats} seats</span>
-                                <span><i class="fas fa-gas-pump"></i> ${car.fuelType}</span>
-                            </div>
-                            <div class="car-price">₹${car.pricePerDay.toLocaleString()}/day</div>
-                            <button class="btn" onclick="openBookingModal(${car.id})" style="width: 100%;">
-                                Book Now
-                            </button>
-                        </div>
-                    `;
-                    carsGrid.appendChild(carCard);
+                if (cars.length === 0) {
+                    carsGrid.innerHTML = '<p>No cars available at the moment.</p>';
+                    return;
                 }
-            });
+
+                cars.forEach(car => {
+                    if (car.available) {
+                        const carCard = document.createElement('div');
+                        carCard.className = 'car-card';
+                        carCard.innerHTML = `
+                            <div class="car-image">
+                                <i class="fas fa-car"></i>
+                            </div>
+                            <div class="car-info">
+                                <div class="car-name">${car.brand} ${car.model}</div>
+                                <div class="car-details">
+                                    <span><i class="fas fa-calendar"></i> ${car.year}</span>
+                                    <span><i class="fas fa-users"></i> ${car.seats} seats</span>
+                                    <span><i class="fas fa-gas-pump"></i> ${car.fuelType}</span>
+                                </div>
+                                <div class="car-price">₹${car.pricePerDay.toLocaleString()}/day</div>
+                                <button class="btn" onclick="openBookingModal(${car.id})" style="width: 100%;">
+                                    Book Now
+                                </button>
+                            </div>
+                        `;
+                        carsGrid.appendChild(carCard);
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading cars:', error);
+                document.getElementById('carsGrid').innerHTML = '<p>Error loading cars. Please refresh the page.</p>';
+            }
+        }
+
+        // Load user bookings from database
+        async function loadUserBookings() {
+            try {
+                const userResponse = await fetch('/api/auth/user');
+                const userData = await userResponse.json();
+
+                if (!userData.authenticated) {
+                    return;
+                }
+
+                const response = await fetch(`/api/bookings/user/${userData.id || 1}`);
+                const bookings = await response.json();
+
+                // Transform database bookings to display format
+                userBookings = bookings.map(booking => ({
+                    id: booking.id,
+                    carId: booking.carId,
+                    carName: `${booking.carBrand} ${booking.carModel}`,
+                    startDate: booking.startDate,
+                    endDate: booking.endDate,
+                    totalCost: booking.totalCost,
+                    status: booking.status,
+                    notes: booking.notes
+                }));
+
+                renderBookings();
+                updateStats();
+            } catch (error) {
+                console.error('Error loading bookings:', error);
+                userBookings = [];
+                renderBookings();
+                updateStats();
+            }
         }
 
         function openBookingModal(carId) {
@@ -473,34 +516,100 @@
             document.getElementById('endDate').min = startDate;
         });
 
-        document.getElementById('bookingForm').addEventListener('submit', function(e) {
+        document.getElementById('bookingForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
             const notes = document.getElementById('notes').value;
 
-            const car = sampleCars.find(c => c.id === selectedCarId);
-            const days = Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)) + 1;
-            const totalCost = days * car.pricePerDay;
+            // Show loading state
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Creating Booking...';
+            submitBtn.disabled = true;
 
-            const booking = {
-                id: Date.now(),
-                carId: selectedCarId,
-                carName: `${car.brand} ${car.model}`,
-                startDate,
-                endDate,
-                totalCost,
-                status: 'Confirmed',
-                notes
-            };
+            try {
+                // Get current user data with better error handling
+                console.log('Fetching user data...');
+                const userResponse = await fetch('/api/auth/user');
+                const userData = await userResponse.json();
 
-            userBookings.push(booking);
-            updateStats();
-            renderBookings();
-            closeBookingModal();
+                console.log('User data received:', userData);
 
-            alert(`Booking confirmed! Total cost: ₹${totalCost.toLocaleString()}`);
+                if (!userData.authenticated) {
+                    alert('Please login to make a booking');
+                    window.location.href = '/login.html';
+                    return;
+                }
+
+                // Validate user ID exists
+                if (!userData.id) {
+                    console.error('User ID not found in response:', userData);
+                    alert('Error: Unable to identify user. Please logout and login again.');
+                    return;
+                }
+
+                // Find car details from loaded cars
+                let selectedCar = null;
+                for (const car of loadedCars) {
+                    if (car.id === selectedCarId) {
+                        selectedCar = car;
+                        break;
+                    }
+                }
+
+                if (!selectedCar) {
+                    alert('Selected car not found');
+                    return;
+                }
+
+                const days = Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)) + 1;
+                const totalCost = days * selectedCar.pricePerDay;
+
+                // Create booking via API
+                const bookingData = {
+                    carId: selectedCarId,
+                    userId: userData.id,
+                    startDate: startDate,
+                    endDate: endDate,
+                    notes: notes
+                };
+
+                console.log('Sending booking data:', bookingData);
+
+                const response = await fetch('/api/bookings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(bookingData)
+                });
+
+                const result = await response.json();
+                console.log('Booking response:', result);
+
+                if (result.success) {
+                    alert(`Booking confirmed! Total cost: ₹${totalCost.toLocaleString()}`);
+
+                    // Refresh data from database
+                    await loadUserBookings();
+                    await loadCars(); // Refresh cars to show updated availability
+
+                    closeBookingModal();
+                } else {
+                    alert('Booking failed: ' + result.message);
+                    console.error('Booking failed:', result);
+                }
+
+            } catch (error) {
+                console.error('Booking error:', error);
+                alert('Error creating booking. Please try again.');
+            } finally {
+                // Reset button state
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
         });
 
         function renderBookings() {
@@ -613,8 +722,8 @@
             const userData = await checkUserAccess();
             if (userData) {
                 await displayUserInfo();
-                loadCars();
-                updateStats();
+                await loadCars();
+                await loadUserBookings(); // Load bookings from database
             }
         });
     </script>

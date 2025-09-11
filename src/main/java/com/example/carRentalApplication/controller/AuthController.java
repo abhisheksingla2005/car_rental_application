@@ -34,6 +34,7 @@ public class AuthController {
             User user = userOpt.get();
             Map<String, Object> response = new HashMap<>();
             response.put("authenticated", true);
+            response.put("id", user.getId()); // Add user ID
             response.put("email", user.getEmail());
             response.put("firstName", user.getFirstName());
             response.put("lastName", user.getLastName());
