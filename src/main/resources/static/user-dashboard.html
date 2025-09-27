@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard - Autexa Car Rental</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        .header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo h1 {
+            color: #333;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: #333;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #555;
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .dashboard-header {
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-header h1 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-header p {
+            color: #666;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .btn {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: 500;
+        }
+
+        .btn:hover {
+            background: #555;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #333;
+            border: 2px solid #333;
+        }
+
+        .btn-outline:hover {
+            background: #333;
+            color: white;
+        }
+
+        .cars-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .car-card {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .car-card:hover {
+            border-color: #333;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .car-image {
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+        }
+
+        .car-info {
+            padding: 1.5rem;
+        }
+
+        .car-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .car-details {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .car-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .bookings-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .bookings-table th,
+        .bookings-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .bookings-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-confirmed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-completed {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .booking-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .booking-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .booking-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .booking-car-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .booking-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .booking-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+        }
+
+        .booking-total {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #333;
+            text-align: right;
+        }
+
+        .approval-notice {
+            background: #e7f3ff;
+            border: 1px solid #b3d7ff;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .approval-notice i {
+            color: #0066cc;
+            font-size: 1.5rem;
+        }
+
+        .approval-notice-text {
+            color: #0066cc;
+        }
+
+        .approval-notice-text h4 {
+            margin-bottom: 0.5rem;
+            color: #004499;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cars-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .bookings-table {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <h1>Autexa</h1>
+            </div>
+            <div class="user-menu">
+                <div class="user-info">
+                    <div class="user-avatar">U</div>
+                    <span>Welcome, User!</span>
+                </div>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="dashboard-header">
+            <h1>Your Dashboard</h1>
+            <p>Manage your car rentals and bookings</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-car"></i>
+                </div>
+                <div class="stat-number" id="totalBookings">0</div>
+                <div class="stat-label">Total Bookings</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-number" id="activeBookings">0</div>
+                <div class="stat-label">Active Bookings</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-rupee-sign"></i>
+                </div>
+                <div class="stat-number">₹<span id="totalSpent">0</span></div>
+                <div class="stat-label">Total Spent</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">Available Cars</h2>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <input type="text" id="carSearchInput" placeholder="Search by model or brand..." style="padding: 0.5rem; border-radius: 8px; border: 1px solid #ccc;">
+                    <label for="budgetSlider">Budget (₹):</label>
+                    <input type="range" id="budgetSlider" min="500" max="10000" step="100" value="10000" style="width: 200px;">
+                    <span id="budgetValue">10000</span>
+                </div>
+            </div>
+            <div class="cars-grid" id="carsGrid">
+                <!-- Cars will be loaded here -->
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">Your Bookings</h2>
+            </div>
+            <div id="bookingsContainer">
+                <div class="empty-state">
+                    <i class="fas fa-calendar-alt"></i>
+                    <h3>No bookings yet</h3>
+                    <p>Start by booking your first car above!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div id="bookingModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 12px; width: 90%; max-width: 500px;">
+            <h3 style="margin-bottom: 1rem;">Book Car</h3>
+            <form id="bookingForm">
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem;">Start Date:</label>
+                    <input type="date" id="startDate" required style="width: 100%; padding: 0.75rem; border: 2px solid #e9ecef; border-radius: 8px;">
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem;">End Date:</label>
+                    <input type="date" id="endDate" required style="width: 100%; padding: 0.75rem; border: 2px solid #e9ecef; border-radius: 8px;">
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem;">Notes (Optional):</label>
+                    <textarea id="notes" rows="3" style="width: 100%; padding: 0.75rem; border: 2px solid #e9ecef; border-radius: 8px;"></textarea>
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <button type="submit" class="btn" style="flex: 1;">Book Now</button>
+                    <button type="button" class="btn btn-outline" onclick="closeBookingModal()" style="flex: 1;">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let selectedCarId = null;
+        let userBookings = [];
+        let loadedCars = [];
+
+        // Load cars from database
+        async function loadCars() {
+            try {
+                const response = await fetch('/api/cars');
+                const cars = await response.json();
+                loadedCars = cars; // Store for booking reference
+
+                const carsGrid = document.getElementById('carsGrid');
+                carsGrid.innerHTML = '';
+
+                if (cars.length === 0) {
+                    carsGrid.innerHTML = '<p>No cars available at the moment.</p>';
+                    return;
+                }
+
+                cars.forEach(car => {
+                    if (car.available) {
+                        const carCard = document.createElement('div');
+                        carCard.className = 'car-card';
+                        carCard.innerHTML = `
+                            <div class="car-image">
+                                ${car.photoUrl ?
+                                    `<img src="${car.photoUrl}" alt="${car.brand} ${car.model}" style="width: 100%; height: 100%; object-fit: cover;">` :
+                                    `<i class="fas fa-car"></i>`
+                                }
+                            </div>
+                            <div class="car-info">
+                                <div class="car-name">${car.brand} ${car.model}</div>
+                                <div class="car-details">
+                                    <span><i class="fas fa-calendar"></i> ${car.year}</span>
+                                    <span><i class="fas fa-users"></i> ${car.seats} seats</span>
+                                    <span><i class="fas fa-gas-pump"></i> ${car.fuelType}</span>
+                                </div>
+                                <div class="car-price">₹${car.pricePerDay.toLocaleString()}/day</div>
+                                <button class="btn" onclick="openBookingModal(${car.id})" style="width: 100%;">
+                                    Book Now
+                                </button>
+                            </div>
+                        `;
+                        carsGrid.appendChild(carCard);
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading cars:', error);
+                document.getElementById('carsGrid').innerHTML = '<p>Error loading cars. Please refresh the page.</p>';
+            }
+        }
+
+        // Load user bookings from database
+        async function loadUserBookings() {
+            try {
+                const userResponse = await fetch('/api/auth/user');
+                const userData = await userResponse.json();
+
+                if (!userData.authenticated) {
+                    return;
+                }
+
+                const response = await fetch(`/api/bookings/user/${userData.id || 1}`);
+                const bookings = await response.json();
+
+                // Transform database bookings to display format
+                userBookings = bookings.map(booking => ({
+                    id: booking.id,
+                    carId: booking.carId,
+                    carName: `${booking.carBrand} ${booking.carModel}`,
+                    startDate: booking.startDate,
+                    endDate: booking.endDate,
+                    totalCost: booking.totalCost,
+                    status: booking.status,
+                    notes: booking.notes
+                }));
+
+                renderBookings();
+                updateStats();
+            } catch (error) {
+                console.error('Error loading bookings:', error);
+                userBookings = [];
+                renderBookings();
+                updateStats();
+            }
+        }
+
+        function openBookingModal(carId) {
+            selectedCarId = carId;
+            document.getElementById('bookingModal').style.display = 'block';
+
+            // Set minimum date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('startDate').min = today;
+            document.getElementById('endDate').min = today;
+        }
+
+        function closeBookingModal() {
+            document.getElementById('bookingModal').style.display = 'none';
+            document.getElementById('bookingForm').reset();
+        }
+
+        document.getElementById('startDate').addEventListener('change', function() {
+            const startDate = this.value;
+            document.getElementById('endDate').min = startDate;
+        });
+
+        // Enhanced booking rendering with proper status handling and approval notices
+        function renderBookings() {
+            const container = document.getElementById('bookingsContainer');
+
+            if (!userBookings || userBookings.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-calendar-alt"></i>
+                        <h3>No bookings yet</h3>
+                        <p>Start by booking your first car above!</p>
+                    </div>`;
+                return;
+            }
+
+            // Check if user has pending bookings to show approval notice
+            const hasPendingBookings = userBookings.some(booking => booking.status === 'PENDING');
+
+            let html = '';
+
+            // Show approval notice if user has pending bookings
+            if (hasPendingBookings) {
+                html += `
+                    <div class="approval-notice">
+                        <i class="fas fa-clock"></i>
+                        <div class="approval-notice-text">
+                            <h4>Booking Approval Required</h4>
+                            <p>Your booking requests are pending admin approval. You'll be notified once they're reviewed.
+                            Please note that cars will only become unavailable after approval.</p>
+                        </div>
+                    </div>`;
+            }
+
+            // Create bookings table
+            html += `
+                <div style="overflow-x: auto;">
+                    <table class="bookings-table">
+                        <thead>
+                            <tr>
+                                <th>Booking ID</th>
+                                <th>Car</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Status</th>
+                                <th>Total Cost</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+
+            userBookings.forEach(booking => {
+                const statusMessage = getStatusMessage(booking.status);
+                html += `
+                    <tr>
+                        <td><strong>#${booking.id}</strong></td>
+                        <td><strong>${booking.carName}</strong></td>
+                        <td>${formatDate(booking.startDate)}</td>
+                        <td>${formatDate(booking.endDate)}</td>
+                        <td>
+                            <span class="status-badge status-${booking.status.toLowerCase()}" title="${statusMessage}">
+                                ${booking.status}
+                            </span>
+                        </td>
+                        <td><strong>₹${booking.totalCost.toLocaleString()}</strong></td>
+                        <td>${booking.notes || 'No notes'}</td>
+                    </tr>`;
+            });
+
+            html += `
+                        </tbody>
+                    </table>
+                </div>`;
+
+            container.innerHTML = html;
+        }
+
+        // Get status message for tooltips
+        function getStatusMessage(status) {
+            switch (status) {
+                case 'PENDING':
+                    return 'Your booking is waiting for admin approval. The car remains available to others until approved.';
+                case 'APPROVED':
+                    return 'Your booking has been approved! The car is now reserved for you.';
+                case 'REJECTED':
+                    return 'Your booking was rejected by the admin. The car is available for others.';
+                case 'COMPLETED':
+                    return 'Your rental has been completed. Thank you for choosing us!';
+                case 'CANCELLED':
+                    return 'This booking was cancelled.';
+                default:
+                    return 'Booking status: ' + status;
+            }
+        }
+
+        // Format date for display
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-IN', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+
+        // Update stats calculation to handle new statuses
+        function updateStats() {
+            document.getElementById('totalBookings').textContent = userBookings.length;
+
+            // Count active bookings (approved and pending)
+            const activeCount = userBookings.filter(b =>
+                b.status === 'APPROVED' || b.status === 'PENDING'
+            ).length;
+            document.getElementById('activeBookings').textContent = activeCount;
+
+            // Calculate total spent only from approved/completed bookings
+            const totalSpent = userBookings
+                .filter(b => b.status === 'APPROVED' || b.status === 'COMPLETED')
+                .reduce((sum, b) => sum + b.totalCost, 0);
+            document.getElementById('totalSpent').textContent = totalSpent.toLocaleString();
+        }
+
+        // Enhanced booking form submission with proper messaging
+        document.getElementById('bookingForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const notes = document.getElementById('notes').value;
+
+            // Show loading state
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Submitting Request...';
+            submitBtn.disabled = true;
+
+            try {
+                // Get current user data
+                const userResponse = await fetch('/api/auth/user');
+                const userData = await userResponse.json();
+
+                if (!userData.authenticated) {
+                    alert('Please login to make a booking');
+                    window.location.href = '/login.html';
+                    return;
+                }
+
+                if (!userData.id) {
+                    alert('Error: Unable to identify user. Please logout and login again.');
+                    return;
+                }
+
+                // Find car details
+                const selectedCar = loadedCars.find(car => car.id === selectedCarId);
+                if (!selectedCar) {
+                    alert('Selected car not found');
+                    return;
+                }
+
+                // Create booking via API
+                const bookingData = {
+                    carId: selectedCarId,
+                    userId: userData.id,
+                    startDate: startDate,
+                    endDate: endDate,
+                    notes: notes
+                };
+
+                const response = await fetch('/api/bookings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(bookingData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Show success message with approval information
+                    alert(`Booking request submitted successfully!\n\n` +
+                          `📋 Booking ID: #${result.bookingId}\n` +
+                          `🚗 Car: ${selectedCar.brand} ${selectedCar.model}\n` +
+                          `📅 Dates: ${startDate} to ${endDate}\n` +
+                          `💰 Total Cost: ₹${result.booking.totalCost}\n\n` +
+                          `⏳ Status: PENDING APPROVAL\n` +
+                          `Your booking is now waiting for admin approval. ` +
+                          `You'll be notified once it's reviewed. The car remains available to others until approved.`);
+
+                    // Refresh data
+                    await loadUserBookings();
+                    await loadCars();
+                    closeBookingModal();
+                } else {
+                    alert('Booking failed: ' + result.message);
+                }
+
+            } catch (error) {
+                console.error('Booking error:', error);
+                alert('Error creating booking request. Please try again.');
+            } finally {
+                // Reset button state
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Car search and budget filter logic
+        const carSearchInput = document.getElementById('carSearchInput');
+        const budgetSlider = document.getElementById('budgetSlider');
+        const budgetValue = document.getElementById('budgetValue');
+
+        carSearchInput.addEventListener('input', filterCars);
+        budgetSlider.addEventListener('input', function() {
+            budgetValue.textContent = budgetSlider.value;
+            filterCars();
+        });
+
+        async function filterCars() {
+            let query = carSearchInput.value.trim();
+            let maxBudget = parseInt(budgetSlider.value);
+            let cars = [];
+            if (query) {
+                const resp = await fetch(`/api/cars/search?query=${encodeURIComponent(query)}`);
+                cars = await resp.json();
+            } else {
+                const resp = await fetch(`/api/cars/search/price?min=0&max=${maxBudget}`);
+                cars = await resp.json();
+            }
+            // Only show available cars
+            cars = cars.filter(car => car.available && car.pricePerDay <= maxBudget);
+            renderCars(cars);
+        }
+
+        function renderCars(carsList) {
+            const carsGrid = document.getElementById('carsGrid');
+            carsGrid.innerHTML = '';
+            if (!carsList || carsList.length === 0) {
+                carsGrid.innerHTML = '<p>No cars available for your search/budget.</p>';
+                return;
+            }
+            carsList.forEach(car => {
+                if (car.available) {
+                    const carCard = document.createElement('div');
+                    carCard.className = 'car-card';
+                    carCard.innerHTML = `
+                        <div class="car-image">
+                            ${car.photoUrl ?
+                                `<img src="${car.photoUrl}" alt="${car.brand} ${car.model}" style="width: 100%; height: 100%; object-fit: cover;">` :
+                                `<i class="fas fa-car"></i>`
+                            }
+                        </div>
+                        <div class="car-info">
+                            <div class="car-name">${car.brand} ${car.model}</div>
+                            <div class="car-details">
+                                <span><i class="fas fa-calendar"></i> ${car.year}</span>
+                                <span><i class="fas fa-users"></i> ${car.seats} seats</span>
+                                <span><i class="fas fa-gas-pump"></i> ${car.fuelType}</span>
+                            </div>
+                            <div class="car-price">₹${car.pricePerDay.toLocaleString()}/day</div>
+                            <button class="btn" onclick="openBookingModal(${car.id})" style="width: 100%;">
+                                Book Now
+                            </button>
+                        </div>
+                    `;
+                    carsGrid.appendChild(carCard);
+                }
+            });
+        }
+
+
+        // Secure logout function
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                fetch('/api/auth/logout', {
+                    method: 'POST'
+                }).then(() => {
+                    window.location.href = '/login.html?logout=true';
+                }).catch(() => {
+                    window.location.href = '/login.html';
+                });
+            }
+        }
+
+        // Initialize page security
+        document.addEventListener('DOMContentLoaded', async function() {
+            const userData = await checkUserAccess();
+            if (userData) {
+                await displayUserInfo();
+                await loadCars();
+                await loadUserBookings(); // Load bookings from database
+            }
+        });
+
+        window.onload = function() {
+            loadCars();
+            loadUserBookings();
+            filterCars();
+        }
+    </script>
+</body>
+</html>
