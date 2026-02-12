@@ -57,11 +57,29 @@ A comprehensive car rental management system built with Spring Boot, featuring s
 
 ### Admin Access
 - Email: admin@gmail.com
+- Email: admin@gmail.com
 - Password: admin123
 
 ### Sample User Access
 - Email: user@gmail.com
 - Password: user123
+
+## Deployment on Render
+
+This project is configured for easy deployment on [Render](https://render.com).
+
+1. **Fork this repository** to your GitHub account.
+2. **Sign up for Render** and connect your GitHub account.
+3. **Create a New Blueprint Instance**:
+   - Go to Dashboard > New > Blueprint.
+   - Select this repository.
+   - Render will automatically detect the `render.yaml` file.
+4. **Deploy**:
+   - Click "Apply".
+   - Render will build the Docker image and provision a free PostgreSQL database.
+   - Once finished, your app will be live at the provided URL.
+
+**Note**: The application automatically detects the environment. On Render, it uses the `render` profile with PostgreSQL. Locally, it continues to use MySQL as configured in `application.properties`.
 
 ## Project Structure
 
