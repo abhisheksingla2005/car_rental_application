@@ -7,7 +7,8 @@
 # So we just need to replace 'postgres://' with 'jdbc:postgresql://'
 
 if [ -n "$DATABASE_URL" ]; then
-    export SPRING_DATASOURCE_URL=$(echo $DATABASE_URL | sed 's|^postgres://|jdbc:postgresql://|')
+    # Handle both postgres:// and postgresql:// prefixes
+    export SPRING_DATASOURCE_URL=$(echo $DATABASE_URL | sed -E 's|^postgres(ql)?://|jdbc:postgresql://|')
     echo "Configured SPRING_DATASOURCE_URL from DATABASE_URL"
 fi
 
